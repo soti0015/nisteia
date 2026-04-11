@@ -8,24 +8,24 @@ import RecipesTab from './components/RecipesTab'
 import GuideTab from './components/GuideTab'
 import ForYouTab from './components/ForYouTab'
 
-const TABS = [
-  { label: 'Today',   icon: '☀️' },
-  { label: 'Scan',    icon: '📷' },
-  { label: 'Recipes', icon: '🍽️' },
-  { label: 'Guide',   icon: '📖' },
-  { label: 'For You', icon: '✨' },
-]
-
 export default function Home() {
   const [tab, setTab] = useState(0)
   const [dayIdx, setDayIdx] = useState(5)
   const [scannerOpen, setScannerOpen] = useState(false)
+  const { t } = useLanguage()
+
+  const TABS = [
+    { label: t.tabToday,   icon: '☀️' },
+    { label: t.tabScan,    icon: '📷' },
+    { label: t.tabRecipes, icon: '🍽️' },
+    { label: t.tabGuide,   icon: '📖' },
+    { label: t.tabForYou,  icon: '✨' },
+  ]
 
   return (
     <main className="min-h-screen bg-[#F4F6F8] flex justify-center">
       <div className="w-full max-w-sm flex flex-col h-screen">
 
-        {/* Screen content */}
         <div className="flex-1 overflow-hidden">
           {tab === 0 && (
             <TodayTab
@@ -47,7 +47,6 @@ export default function Home() {
           {tab === 4 && <ForYouTab dayIdx={dayIdx} />}
         </div>
 
-        {/* Tab bar */}
         <div className={`bg-white border-t border-gray-100 flex shadow-lg ${scannerOpen ? 'hidden' : ''}`}>
           {TABS.map((t, i) => (
             <button

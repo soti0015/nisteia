@@ -98,7 +98,7 @@ export default function TodayTab({
 
           {/* Tip */}
           <div className="bg-[#F0FAF5] rounded-xl px-3 py-2 mb-3">
-            <p className="text-sm text-[#2D7A55] font-medium leading-relaxed">💬 {day.tip}</p>
+            <p className="text-sm text-[#2D7A55] font-medium leading-relaxed">💬 {t.days[dayIdx].tip}</p>
           </div>
 
           {/* Rules grid */}
@@ -130,13 +130,13 @@ export default function TodayTab({
             </div>
             <div className="flex-1">
               <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">{t.storyBehindToday}</p>
-              <p className="text-sm font-bold text-[#1A1A2E]">{day.storyTitle}</p>
+                <p className="text-sm font-bold text-[#1A1A2E]">{t.days[dayIdx].storyTitle}</p>
             </div>
             <span className="text-amber-400 text-lg">{storyOpen ? '▲' : '▼'}</span>
           </div>
           {storyOpen && (
             <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-sm text-gray-500 leading-relaxed">{day.story}</p>
+             <p className="text-sm text-gray-500 leading-relaxed">{t.days[dayIdx].story}</p>
             </div>
           )}
         </div>

@@ -4,12 +4,6 @@ import { useState } from 'react'
 import { DAYS } from '../data/days'
 import { useLanguage } from '../context/LanguageContext'
 
-const FOOD_PREFS = [
-  'Chickpeas', 'Lentils', 'Eggplant', 'Spinach', 'Tomatoes',
-  'Pasta', 'Rice', 'Mushrooms', 'Olives', 'Tahini',
-  'Walnuts', 'Cauliflower', 'Zucchini', 'Capsicum', 'Pita bread',
-]
-
 type Suggestion = { name: string; desc: string; emoji: string }
 
 export default function ForYouTab({ dayIdx }: { dayIdx: number }) {
@@ -52,19 +46,17 @@ export default function ForYouTab({ dayIdx }: { dayIdx: number }) {
   return (
     <div className="flex flex-col h-full">
 
-      {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
         <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{t.personalisedFor}</p>
         <h2 className="text-2xl font-black text-[#1A1A2E]">{t.forYou}</h2>
         <p className="text-sm text-gray-400 mt-1">{t.pickIngredients}</p>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
 
         <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">{t.whatDoYouLike}</p>
         <div className="flex flex-wrap gap-2 mb-5">
-          {FOOD_PREFS.map(food => (
+          {t.foodPrefs.map(food => (
             <button
               key={food}
               onClick={() => togglePref(food)}
@@ -120,7 +112,6 @@ export default function ForYouTab({ dayIdx }: { dayIdx: number }) {
             </button>
           </div>
         )}
-
       </div>
     </div>
   )
