@@ -1,7 +1,7 @@
 'use client'
-import React from 'react'
-import { useLanguage } from './context/LanguageContext'
+
 import { useState } from 'react'
+import { useLanguage } from './context/LanguageContext'
 import TodayTab from './components/TodayTab'
 import ScanTab from './components/ScanTab'
 import RecipesTab from './components/RecipesTab'
@@ -17,7 +17,6 @@ const TABS = [
 ]
 
 export default function Home() {
-  const { language, toggleLanguage } = useLanguage()
   const [tab, setTab] = useState(0)
   const [dayIdx, setDayIdx] = useState(5)
   const [scannerOpen, setScannerOpen] = useState(false)
@@ -33,6 +32,7 @@ export default function Home() {
               dayIdx={dayIdx}
               setDayIdx={setDayIdx}
               onScanClick={() => setTab(1)}
+              onRecipesClick={() => setTab(2)}
             />
           )}
           {tab === 1 && (
@@ -47,22 +47,22 @@ export default function Home() {
           {tab === 4 && <ForYouTab dayIdx={dayIdx} />}
         </div>
 
-<div className={`bg-white border-t border-gray-100 flex shadow-lg ${scannerOpen ? 'hidden' : ''}`}>
-  {TABS.map((t, i) => (
-    <button
-      key={i}
-      onClick={() => setTab(i)}
-      className="flex-1 flex flex-col items-center py-2 gap-1"
-    >
-      <span className="text-xl">{t.icon}</span>
-      <span className={`text-[10px] font-bold ${tab === i ? 'text-[#3DBE7A]' : 'text-gray-300'}`}>
-        {t.label}
-      </span>
-      {tab === i && <div className="w-4 h-0.5 rounded-full bg-[#3DBE7A]" />}
-    </button>
-  ))}
-</div>
-        
+        {/* Tab bar */}
+        <div className={`bg-white border-t border-gray-100 flex shadow-lg ${scannerOpen ? 'hidden' : ''}`}>
+          {TABS.map((t, i) => (
+            <button
+              key={i}
+              onClick={() => setTab(i)}
+              className="flex-1 flex flex-col items-center py-2 gap-1"
+            >
+              <span className="text-xl">{t.icon}</span>
+              <span className={`text-[10px] font-bold ${tab === i ? 'text-[#3DBE7A]' : 'text-gray-300'}`}>
+                {t.label}
+              </span>
+              {tab === i && <div className="w-4 h-0.5 rounded-full bg-[#3DBE7A]" />}
+            </button>
+          ))}
+        </div>
 
       </div>
     </main>

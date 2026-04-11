@@ -8,10 +8,12 @@ export default function TodayTab({
   dayIdx,
   setDayIdx,
   onScanClick,
+  onRecipesClick,
 }: {
   dayIdx: number
   setDayIdx: (i: number) => void
   onScanClick: () => void
+  onRecipesClick: () => void
 }) {
   const [storyOpen, setStoryOpen] = useState(false)
   const { language, toggleLanguage, t } = useLanguage()
@@ -138,7 +140,10 @@ export default function TodayTab({
         </button>
 
         {/* Recipe shortcut */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
+        <div
+          onClick={onRecipesClick}
+          className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3 cursor-pointer"
+        >
           <div className="text-3xl">🍽️</div>
           <div className="flex-1">
             <p className="text-sm font-black text-[#1A1A2E]">{t.whatShouldICook}</p>
