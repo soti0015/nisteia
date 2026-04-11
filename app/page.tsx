@@ -7,6 +7,7 @@ import ScanTab from './components/ScanTab'
 import RecipesTab from './components/RecipesTab'
 import GuideTab from './components/GuideTab'
 import ForYouTab from './components/ForYouTab'
+import EasterScreen from './components/EasterScreen'
 import { getTodayDayIdx } from './data/days'
 
 export default function Home() {
@@ -15,6 +16,16 @@ export default function Home() {
   const [scannerOpen, setScannerOpen] = useState(false)
   const { t } = useLanguage()
 
+  function isEasterSunday(): boolean {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const easter = new Date('2025-04-20')
+    easter.setHours(0, 0, 0, 0)
+    return today.getTime() === easter.getTime()
+  }
+
+  const [showEaster, setShowEaster] = useState(isEasterSunday())
+
   const TABS = [
     { label: t.tabToday,   icon: '☀️' },
     { label: t.tabScan,    icon: '📷' },
@@ -22,6 +33,10 @@ export default function Home() {
     { label: t.tabGuide,   icon: '📖' },
     { label: t.tabForYou,  icon: '✨' },
   ]
+
+  if (showEaster) {
+    return <EasterScreen onEnter={() => setShowEaster(false)} />
+  }
 
   return (
     <main className="min-h-screen bg-[#F4F6F8] flex justify-center">
