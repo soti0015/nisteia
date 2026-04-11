@@ -20,24 +20,71 @@ export default function ScanTab({ dayIdx }: { dayIdx: number }) {
 
   const day = DAYS[dayIdx]
 
-  function checkProduct(code?: string) {
-    const value = code || input
-    setError('')
-    setResult(null)
-    const key = value.trim().toUpperCase()
-    const product = PRODUCTS[key] || PRODUCTS[value.trim()]
-    if (!key) { setError('Enter a barcode to check.'); return }
-    if (!product) { setError('Product not found. Try DEMO1, DEMO2 or 9310036009101'); return }
+async function checkProduct(code?: string) {
+  const value = code || input
+  setError('')
+  setResult(null)
+
+  if (!value.trim()) { setError('Enter a barcode to check.'); return }
+
+  // Check local products first
+  const key = value.trim().toUpperCase()
+  const local = PRODUCTS[key] || PRODUCTS[value.trim()]
+
+  if (local) {
+    const issues: string[] = []
+    if (local.meat) issues.push('Contains meat 🥩')
+    if (local.dairy) issues.push('Contains dairy 🧀')
+    if (local.fish && !day.fish) issues.push('Contains fish 🐟')
+    if (local.oil && !day.oil) issues.push('Contains oil 🫒')
+    const pct = Math.round(((4 - issues.length) / 4) * 100)
+    setResult({ ...local, issues, pct, ok: issues.length === 0 })
+    return
+  }
+
+  // Otherwise look up Open Food Facts
+  try {
+    setError('Looking up product...')
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${value.trim()}.json`)
+    const data = await res.json()
+
+    if (data.status === 0) {
+      setError('Product not found. Try scanning another barcode.')
+      return
+    }
+
+    const product = data.product
+    const name = product.product_name || 'Unknown Product'
+    const brand = product.brands || 'Unknown Brand'
+    const ingredients = (product.ingredients_text || '').toLowerCase()
+    const labels = (product.labels || '').toLowerCase()
+
+    const meat = /chicken|beef|pork|lamb|meat|bacon|ham|turkey|fish|salmon|tuna|prawn|shrimp|anchovy/.test(ingredients)
+    const dairy = /milk|cheese|butter|cream|yogurt|yoghurt|whey|lactose|casein/.test(ingredients)
+    const fish = /fish|salmon|tuna|cod|prawn|shrimp|anchovy|seafood/.test(ingredients)
+    const oil = /vegetable oil|olive oil|sunflower oil|canola oil|palm oil/.test(ingredients)
 
     const issues: string[] = []
-    if (product.meat) issues.push('Contains meat 🥩')
-    if (product.dairy) issues.push('Contains dairy 🧀')
-    if (product.fish && !day.fish) issues.push('Contains fish 🐟')
-    if (product.oil && !day.oil) issues.push('Contains oil 🫒')
+    if (meat && !fish) issues.push('Contains meat 🥩')
+    if (dairy) issues.push('Contains dairy 🧀')
+    if (fish && !day.fish) issues.push('Contains fish 🐟')
+    if (oil && !day.oil) issues.push('Contains oil 🫒')
 
     const pct = Math.round(((4 - issues.length) / 4) * 100)
-    setResult({ ...product, issues, pct, ok: issues.length === 0 })
+    setError('')
+    setResult({
+      name,
+      brand,
+      emoji: '🛒',
+      issues,
+      pct,
+      ok: issues.length === 0,
+    })
+
+  } catch {
+    setError('Could not look up product. Check your connection.')
   }
+}
 
   const handleScan = useCallback((code: string) => {
     setInput(code)
