@@ -18,35 +18,33 @@ export default function BarcodeScanner({
   day: { name: string; fish: boolean; oil: boolean; wine: boolean }
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const readerRef = useRef<BrowserMultiFormatReader | null>(null)
+  const scannedRef = useRef(false)
+  const controlsRef = useRef<{ stop: () => void } | null>(null)
   const [result, setResult] = useState<ProductResult>(null)
   const [loading, setLoading] = useState(false)
-  const [scanned, setScanned] = useState(false)
 
-useEffect(() => {
-  const reader = new BrowserMultiFormatReader()
-  readerRef.current = reader
-  let controls: { stop: () => void } | null = null
+  useEffect(() => {
+    const reader = new BrowserMultiFormatReader()
 
-  reader.decodeFromVideoDevice(
-    undefined,
-    videoRef.current!,
-    async (res) => {
-      if (res && !scanned) {
-        setScanned(true)
-        setLoading(true)
-        await lookupProduct(res.getText())
-        setLoading(false)
+    reader.decodeFromVideoDevice(
+      undefined,
+      videoRef.current!,
+      async (res) => {
+        if (res && !scannedRef.current) {
+          scannedRef.current = true
+          setLoading(true)
+          await lookupProduct(res.getText())
+          setLoading(false)
+        }
       }
-    }
-  ).then((c) => {
-    controls = c
-  }).catch(() => {})
+    ).then((c) => {
+      controlsRef.current = c
+    }).catch(() => {})
 
-  return () => {
-    try { controls?.stop() } catch {}
-  }
-}, [])
+    return () => {
+      try { controlsRef.current?.stop() } catch {}
+    }
+  }, [])
 
   async function lookupProduct(code: string) {
     try {
@@ -95,7 +93,7 @@ useEffect(() => {
   function handleScanAgain() {
     setResult(null)
     setLoading(false)
-    setScanned(false)
+    scannedRef.current = false
   }
 
   return (
@@ -107,7 +105,7 @@ useEffect(() => {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Dark overlay top bar */}
+      {/* Top bar */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-10 pb-4 bg-gradient-to-b from-black/60 to-transparent">
         <p className="text-white font-black text-lg">Scan Barcode</p>
         <button
@@ -126,7 +124,7 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Loading indicator */}
+      {/* Loading */}
       {loading && (
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
           <div className="bg-black/50 rounded-2xl px-6 py-4 flex flex-col items-center gap-2">
@@ -136,17 +134,13 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Bottom sheet result — slides up over camera */}
+      {/* Bottom sheet result */}
       {result && (
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-white rounded-t-3xl shadow-2xl">
-
-          {/* Pull handle */}
           <div className="flex justify-center pt-3 pb-1">
             <div className="w-10 h-1 bg-gray-200 rounded-full" />
           </div>
-
           <div className="px-4 pb-8 pt-3">
-            {/* Product info */}
             <div className="flex items-center gap-3 mb-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${result.ok ? 'bg-[#F0FAF5]' : 'bg-red-50'}`}>
                 {result.ok ? '✅' : '🚫'}
@@ -157,7 +151,6 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Verdict */}
             <div className={`rounded-2xl px-4 py-3 mb-4 ${result.ok ? 'bg-[#F0FAF5]' : 'bg-red-50'}`}>
               <p className={`text-lg font-black ${result.ok ? 'text-[#3DBE7A]' : 'text-red-400'}`}>
                 {result.ok ? 'You can eat this today!' : 'Avoid this today'}
@@ -165,7 +158,6 @@ useEffect(() => {
               <p className="text-xs text-gray-400 mt-0.5">on {day.name}</p>
             </div>
 
-            {/* Issues */}
             {result.issues.length > 0 && (
               <div className="mb-4">
                 {result.issues.map((issue, i) => (
@@ -176,7 +168,6 @@ useEffect(() => {
               </div>
             )}
 
-            {/* Buttons */}
             <div className="flex gap-3">
               <button
                 onClick={handleScanAgain}
