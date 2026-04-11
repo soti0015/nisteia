@@ -16,13 +16,17 @@ export default function Home() {
   const [scannerOpen, setScannerOpen] = useState(false)
   const { t } = useLanguage()
 
+  //function isEasterSunday(): boolean {
+   // const today = new Date()
+    //today.setHours(0, 0, 0, 0)
+    //const easter = new Date('2025-04-20')
+   // easter.setHours(0, 0, 0, 0)
+   // return today.getTime() === easter.getTime()
+//}
+
   function isEasterSunday(): boolean {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const easter = new Date('2025-04-20')
-    easter.setHours(0, 0, 0, 0)
-    return today.getTime() === easter.getTime()
-  }
+  return true
+}
 
   const [showEaster, setShowEaster] = useState(isEasterSunday())
 
