@@ -133,7 +133,7 @@ export default function BarcodeScanner({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col">
+    <div className="fixed inset-0 z-[999] flex flex-col">
       {/* Full screen camera */}
       <video
         ref={videoRef}

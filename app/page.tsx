@@ -45,24 +45,23 @@ export default function Home() {
           {tab === 4 && <ForYouTab dayIdx={dayIdx} />}
         </div>
 
-        {/* Tab bar — hidden when scanner is open */}
-        {!scannerOpen && (
-          <div className="bg-white border-t border-gray-100 flex shadow-lg">
-            {TABS.map((t, i) => (
-              <button
-                key={i}
-                onClick={() => setTab(i)}
-                className="flex-1 flex flex-col items-center py-2 gap-1"
-              >
-                <span className="text-xl">{t.icon}</span>
-                <span className={`text-[10px] font-bold ${tab === i ? 'text-[#3DBE7A]' : 'text-gray-300'}`}>
-                  {t.label}
-                </span>
-                {tab === i && <div className="w-4 h-0.5 rounded-full bg-[#3DBE7A]" />}
-              </button>
-            ))}
-          </div>
-        )}
+{/* Tab bar — hidden when scanner is open */}
+<div className={`bg-white border-t border-gray-100 flex shadow-lg ${scannerOpen ? 'hidden' : ''}`}>
+  {TABS.map((t, i) => (
+    <button
+      key={i}
+      onClick={() => setTab(i)}
+      className="flex-1 flex flex-col items-center py-2 gap-1"
+    >
+      <span className="text-xl">{t.icon}</span>
+      <span className={`text-[10px] font-bold ${tab === i ? 'text-[#3DBE7A]' : 'text-gray-300'}`}>
+        {t.label}
+      </span>
+      {tab === i && <div className="w-4 h-0.5 rounded-full bg-[#3DBE7A]" />}
+    </button>
+  ))}
+</div>
+        
 
       </div>
     </main>
