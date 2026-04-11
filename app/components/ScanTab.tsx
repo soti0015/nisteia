@@ -8,17 +8,37 @@ import BarcodeScanner from './BarcodeScanner'
 const PRODUCTS: Record<string, { name: string; brand: string; emoji: string; meat: boolean; dairy: boolean; fish: boolean; oil: boolean }> = {
   '9310036009101': { name: 'Heinz Baked Beans', brand: 'Heinz', emoji: '🫘', meat: false, dairy: false, fish: false, oil: false },
   '9300675033019': { name: 'Weet-Bix', brand: 'Sanitarium', emoji: '🌾', meat: false, dairy: false, fish: false, oil: false },
+  '9310587002271': { name: 'Vegemite', brand: 'Bega', emoji: '🫙', meat: false, dairy: false, fish: false, oil: false },
   '9310017009009': { name: 'Tip Top White Bread', brand: 'Tip Top', emoji: '🍞', meat: false, dairy: false, fish: false, oil: true },
   '9310023007553': { name: 'Milo', brand: 'Nestlé', emoji: '🥛', meat: false, dairy: true, fish: false, oil: false },
-  '9310587002271': { name: 'Vegemite', brand: 'Bega', emoji: '🫙', meat: false, dairy: false, fish: false, oil: false },
+  '9310164007957': { name: 'Uncle Tobys Oats', brand: 'Uncle Tobys', emoji: '🌾', meat: false, dairy: false, fish: false, oil: false },
+  '9310076007558': { name: 'SPC Tomato Soup', brand: 'SPC', emoji: '🍅', meat: false, dairy: false, fish: false, oil: false },
+  '9310539000016': { name: 'Sanitarium Peanut Butter', brand: 'Sanitarium', emoji: '🥜', meat: false, dairy: false, fish: false, oil: true },
+  '9310397000043': { name: 'Praise Olive Oil', brand: 'Praise', emoji: '🫒', meat: false, dairy: false, fish: false, oil: true },
+  '9310076200013': { name: 'SPC Chickpeas', brand: 'SPC', emoji: '🫘', meat: false, dairy: false, fish: false, oil: false },
+  '9310076200020': { name: 'SPC Lentils', brand: 'SPC', emoji: '🍲', meat: false, dairy: false, fish: false, oil: false },
+  '9310023015015': { name: 'Nescafe Blend 43', brand: 'Nestlé', emoji: '☕', meat: false, dairy: false, fish: false, oil: false },
+  '9300616012042': { name: 'Arnott\'s Vita-Weat', brand: 'Arnott\'s', emoji: '🍘', meat: false, dairy: false, fish: false, oil: true },
+  '9310055002012': { name: 'Berri Orange Juice', brand: 'Berri', emoji: '🍊', meat: false, dairy: false, fish: false, oil: false },
+  '9310076007480': { name: 'SPC Four Bean Mix', brand: 'SPC', emoji: '🫘', meat: false, dairy: false, fish: false, oil: false },
 }
 
 const PRODUCTS_GR: Record<string, string> = {
   '9310036009101': 'Φασόλια Heinz',
   '9300675033019': 'Weet-Bix Sanitarium',
+  '9310587002271': 'Vegemite',
   '9310017009009': 'Λευκό Ψωμί Tip Top',
   '9310023007553': 'Milo Nestlé',
-  '9310587002271': 'Vegemite',
+  '9310164007957': 'Βρώμη Uncle Tobys',
+  '9310076007558': 'Σούπα Ντομάτας SPC',
+  '9310539000016': 'Φυστικοβούτυρο Sanitarium',
+  '9310397000043': 'Ελαιόλαδο Praise',
+  '9310076200013': 'Ρεβύθια SPC',
+  '9310076200020': 'Φακές SPC',
+  '9310023015015': 'Καφές Nescafe',
+  '9300616012042': 'Κράκερ Vita-Weat',
+  '9310055002012': 'Χυμός Πορτοκαλιού Berri',
+  '9310076007480': 'Τέσσερα Είδη Φασολιών SPC',
 }
 
 export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {

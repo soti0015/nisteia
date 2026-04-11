@@ -1,0 +1,46 @@
+import { NextResponse } from 'next/server'
+
+export async function POST(req: Request) {
+  const { productName, day, fish, oil } = await req.json()
+
+  const prompt = `You are a Greek Orthodox fasting assistant. Today is ${day}.
+
+Fasting rules: No meat, no dairy, no eggs. Fish: ${fish ? 'allowed' : 'not allowed'}. Oil: ${oil ? 'allowed' : 'not allowed'}.
+
+The user wants to know if they can eat: "${productName}"
+
+Based on what you know about this product, determine if it is permitted during Orthodox fasting today.
+
+Return ONLY a JSON object like this:
+{
+  "ok": true or false,
+  "name": "the product name cleaned up",
+  "reason": "one short sentence explaining why it is or isn't allowed",
+  "issues": ["issue 1", "issue 2"] or []
+}`
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    })
+
+    const data = await res.json()
+    const text = data.content?.[0]?.text || '{}'
+    const clean = text.replace(/```json|```/g, '').trim()
+    const result = JSON.parse(clean)
+
+    return NextResponse.json(result)
+  } catch {
+    return NextResponse.json({ ok: false, name: productName, reason: 'Could not check this product.', issues: [] })
+  }
+}
