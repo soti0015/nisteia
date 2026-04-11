@@ -1,0 +1,133 @@
+'use client'
+
+import { useState } from 'react'
+import { DAYS } from '../data/days'
+
+const FOOD_PREFS = [
+  'Chickpeas', 'Lentils', 'Eggplant', 'Spinach', 'Tomatoes',
+  'Pasta', 'Rice', 'Mushrooms', 'Olives', 'Tahini',
+  'Walnuts', 'Cauliflower', 'Zucchini', 'Capsicum', 'Pita bread',
+]
+
+type Suggestion = { name: string; desc: string; emoji: string }
+
+export default function ForYouTab({ dayIdx }: { dayIdx: number }) {
+  const [selected, setSelected] = useState<string[]>([])
+  const [suggestions, setSuggestions] = useState<Suggestion[] | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const day = DAYS[dayIdx]
+
+  function togglePref(food: string) {
+    setSelected(prev =>
+      prev.includes(food) ? prev.filter(f => f !== food) : [...prev, food]
+    )
+    setSuggestions(null)
+  }
+
+  async function getSuggestions() {
+    if (selected.length === 0) return
+    setLoading(true)
+    setSuggestions(null)
+
+    const rules = `No meat, no dairy, no eggs. Fish: ${day.fish ? 'allowed' : 'not allowed'}. Oil: ${day.oil ? 'allowed' : 'not allowed'}.`
+
+    try {
+      const res = await fetch('/api/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          day: day.name,
+          rules,
+          ingredients: selected,
+        }),
+      })
+      const data = await res.json()
+      setSuggestions(data.suggestions)
+    } catch {
+      setSuggestions([{ name: 'Something went wrong', desc: 'Please try again.', emoji: '⚠️' }])
+    }
+
+    setLoading(false)
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+
+      {/* Header */}
+      <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Personalised for</p>
+        <h2 className="text-2xl font-black text-[#1A1A2E]">For You ✨</h2>
+        <p className="text-sm text-gray-400 mt-1">Pick ingredients you enjoy and get meal ideas for {day.name}.</p>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+
+        {/* Preference picker */}
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">What do you like?</p>
+        <div className="flex flex-wrap gap-2 mb-5">
+          {FOOD_PREFS.map(food => (
+            <button
+              key={food}
+              onClick={() => togglePref(food)}
+              className={`px-3 py-2 rounded-full text-xs font-bold border-2 transition-all ${
+                selected.includes(food)
+                  ? 'bg-[#1A1A2E] text-white border-[#1A1A2E]'
+                  : 'bg-white text-gray-500 border-gray-200'
+              }`}
+            >
+              {food}
+            </button>
+          ))}
+        </div>
+
+        {/* Suggest button */}
+        {selected.length > 0 && (
+          <button
+            onClick={getSuggestions}
+            disabled={loading}
+            className={`w-full py-4 rounded-2xl text-white font-black text-base mb-4 transition-all ${
+              loading ? 'bg-gray-300' : 'bg-[#3DBE7A] shadow-lg'
+            }`}
+          >
+            {loading ? 'Finding ideas for you...' : `✨ Suggest meals for ${day.name}`}
+          </button>
+        )}
+
+        {/* Empty state */}
+        {selected.length === 0 && (
+          <div className="bg-gray-100 rounded-2xl p-6 text-center">
+            <p className="text-3xl mb-2">👆</p>
+            <p className="text-sm text-gray-400">Pick at least one ingredient to get suggestions.</p>
+          </div>
+        )}
+
+        {/* Suggestions */}
+        {suggestions && !loading && (
+          <div className="space-y-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Your suggestions</p>
+            {suggestions.map((s, i) => (
+              <div key={i} className="bg-white rounded-2xl p-4 shadow-sm flex gap-3 items-start">
+                <div className="w-12 h-12 rounded-xl bg-[#F0FAF5] flex items-center justify-center text-2xl flex-shrink-0">
+                  {s.emoji}
+                </div>
+                <div>
+                  <p className="text-sm font-black text-[#1A1A2E]">{s.name}</p>
+                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() => setSuggestions(null)}
+              className="w-full py-3 rounded-xl border-2 border-[#3DBE7A] text-[#3DBE7A] font-black text-sm"
+            >
+              Try different ingredients
+            </button>
+          </div>
+        )}
+
+      </div>
+    </div>
+  )
+}
