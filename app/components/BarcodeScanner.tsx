@@ -20,11 +20,23 @@ export default function BarcodeScanner({
   const videoRef = useRef<HTMLVideoElement>(null)
   const scannedRef = useRef(false)
   const controlsRef = useRef<{ stop: () => void } | null>(null)
+  const torchRef = useRef(false)
+  const streamRef = useRef<MediaStream | null>(null)
   const [result, setResult] = useState<ProductResult>(null)
   const [loading, setLoading] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
 
   useEffect(() => {
     const reader = new BrowserMultiFormatReader()
+
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' }
+    }).then(stream => {
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+      }
+    })
 
     reader.decodeFromVideoDevice(
       undefined,
@@ -43,6 +55,7 @@ export default function BarcodeScanner({
 
     return () => {
       try { controlsRef.current?.stop() } catch {}
+      try { streamRef.current?.getTracks().forEach(t => t.stop()) } catch {}
     }
   }, [])
 
@@ -96,9 +109,24 @@ export default function BarcodeScanner({
     scannedRef.current = false
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col">
+  async function toggleTorch() {
+    const stream = streamRef.current
+    if (!stream) return
+    const track = stream.getVideoTracks()[0]
+    if (!track) return
+    torchRef.current = !torchRef.current
+    try {
+      await (track as any).applyConstraints({
+        advanced: [{ torch: torchRef.current }]
+      })
+      setTorchOn(torchRef.current)
+    } catch {
+      console.log('Torch not supported on this device')
+    }
+  }
 
+  return (
+    <div className="fixed inset-0 z-[100] flex flex-col">
       {/* Full screen camera */}
       <video
         ref={videoRef}
@@ -108,12 +136,20 @@ export default function BarcodeScanner({
       {/* Top bar */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-10 pb-4 bg-gradient-to-b from-black/60 to-transparent">
         <p className="text-white font-black text-lg">Scan Barcode</p>
-        <button
-          onClick={onClose}
-          className="text-white text-sm font-bold bg-white/20 px-3 py-1 rounded-full"
-        >
-          Cancel
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTorch}
+            className={`text-sm font-bold px-3 py-1 rounded-full ${torchOn ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}
+          >
+            {torchOn ? '🔦 On' : '🔦 Off'}
+          </button>
+          <button
+            onClick={onClose}
+            className="text-white text-sm font-bold bg-white/20 px-3 py-1 rounded-full"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
 
       {/* Viewfinder */}

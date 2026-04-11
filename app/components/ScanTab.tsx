@@ -12,7 +12,11 @@ const PRODUCTS: Record<string, { name: string; brand: string; emoji: string; mea
   '5010477348478': { name: 'Dairy Milk', brand: 'Cadbury', emoji: '🍫', meat: false, dairy: true, fish: false, oil: false },
 }
 
-export default function ScanTab({ dayIdx }: { dayIdx: number }) {
+export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: { 
+  dayIdx: number
+  onScannerOpen: () => void
+  onScannerClose: () => void
+}) {
   const [input, setInput] = useState('')
   const [result, setResult] = useState<null | { name: string; brand: string; emoji: string; ok: boolean; issues: string[]; pct: number }>(null)
   const [error, setError] = useState('')
@@ -107,7 +111,7 @@ async function checkProduct(code?: string) {
         {/* Camera button + input */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
           <button
-            onClick={() => setShowScanner(true)}
+            onClick={() => { setShowScanner(true); onScannerOpen() }}
             className="w-full bg-[#1A1A2E] text-white font-black text-base py-4 rounded-xl mb-3"
           >
             📷 Open Camera Scanner
@@ -192,7 +196,7 @@ async function checkProduct(code?: string) {
       {showScanner && (
   <BarcodeScanner
     day={day}
-    onClose={() => setShowScanner(false)}
+    onClose={() => { setShowScanner(false); onScannerClose() }}
   />
 )}
 
