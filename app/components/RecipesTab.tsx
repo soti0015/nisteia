@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { DAYS } from '../data/days'
+import { useLanguage } from '../context/LanguageContext'
 
 const RECIPES = [
   { name: 'Bean Soup', greek: 'Φασολάδα', emoji: '🫘', time: '45 min', diff: 'Easy', oilOk: true, fishOk: false, desc: 'The national fasting dish. Warm and filling.', steps: ['Boil white beans until soft or use canned.', 'Fry onion, carrot and celery in olive oil.', 'Add tomatoes and beans, simmer 20 min.', 'Season with salt, pepper and lemon.'] },
@@ -15,6 +16,7 @@ const RECIPES = [
 export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
   const [openRecipe, setOpenRecipe] = useState<string | null>(null)
   const day = DAYS[dayIdx]
+  const { t } = useLanguage()
 
   const suitable = RECIPES.filter(r => (!r.fishOk || day.fish) && (!r.oilOk || day.oil))
   const other = RECIPES.filter(r => !suitable.includes(r))
@@ -24,9 +26,9 @@ export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
 
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Fasting</p>
-        <h2 className="text-2xl font-black text-[#1A1A2E]">Recipes</h2>
-        <p className="text-sm text-gray-400 mt-1">Tap a recipe to see how to make it.</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{t.fasting}</p>
+        <h2 className="text-2xl font-black text-[#1A1A2E]">{t.recipes}</h2>
+        <p className="text-sm text-gray-400 mt-1">{t.tapToExpand}</p>
       </div>
 
       {/* Content */}
@@ -35,7 +37,7 @@ export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
         {/* Good for today */}
         <div className="flex items-center gap-2 mb-1">
           <div className="w-2 h-2 rounded-full bg-[#3DBE7A]" />
-          <p className="text-sm font-black text-[#1A1A2E]">Good for today</p>
+          <p className="text-sm font-black text-[#1A1A2E]">{t.goodForToday}</p>
         </div>
 
         {suitable.map((rec) => {
@@ -59,7 +61,7 @@ export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
 
               {isOpen && (
                 <div className="border-t border-gray-100 px-4 pb-4 pt-3 bg-gray-50">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#3DBE7A] mb-3">How to make it</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#3DBE7A] mb-3">{t.howToMakeIt}</p>
                   {rec.steps.map((step, j) => (
                     <div key={j} className="flex gap-3 mb-3">
                       <div className="w-6 h-6 rounded-full bg-[#3DBE7A] text-white text-xs font-black flex items-center justify-center flex-shrink-0">
@@ -79,7 +81,7 @@ export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
           <>
             <div className="flex items-center gap-2 mt-3 mb-1">
               <div className="w-2 h-2 rounded-full bg-amber-400" />
-              <p className="text-sm font-black text-[#1A1A2E]">Not available today</p>
+              <p className="text-sm font-black text-[#1A1A2E]">{t.notAvailableToday}</p>
             </div>
             {other.map((rec) => (
               <div key={rec.name} className="bg-white rounded-2xl shadow-sm overflow-hidden opacity-40">

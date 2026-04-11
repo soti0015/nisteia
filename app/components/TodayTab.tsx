@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { DAYS } from '../data/days'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function TodayTab({
   dayIdx,
@@ -13,14 +14,15 @@ export default function TodayTab({
   onScanClick: () => void
 }) {
   const [storyOpen, setStoryOpen] = useState(false)
+  const { language, toggleLanguage, t } = useLanguage()
   const day = DAYS[dayIdx]
 
   const rules = [
-    { label: 'Meat',  icon: '🥩', ok: false },
-    { label: 'Dairy', icon: '🧀', ok: false },
-    { label: 'Fish',  icon: '🐟', ok: day.fish },
-    { label: 'Oil',   icon: '🫒', ok: day.oil },
-    { label: 'Wine',  icon: '🍷', ok: day.wine },
+    { label: t.meat,  icon: '🥩', ok: false },
+    { label: t.dairy, icon: '🧀', ok: false },
+    { label: t.fish,  icon: '🐟', ok: day.fish },
+    { label: t.oil,   icon: '🫒', ok: day.oil },
+    { label: t.wine,  icon: '🍷', ok: day.wine },
   ]
 
   return (
@@ -30,15 +32,23 @@ export default function TodayTab({
       <div className="bg-white px-4 pt-6 pb-0 border-b border-gray-100">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Greek Orthodox</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t.greekOrthodox}</p>
             <h1 className="text-2xl font-black text-[#1A1A2E]">Νηστεία <span className="text-[#3DBE7A]">☦</span></h1>
           </div>
-          <button
-            onClick={onScanClick}
-            className="bg-[#3DBE7A] text-white text-sm font-bold px-4 py-2 rounded-xl"
-          >
-            📷 Scan
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleLanguage}
+              className="bg-gray-100 text-gray-600 text-xs font-bold px-3 py-2 rounded-xl"
+            >
+              {language === 'en' ? '🇬🇷 GR' : '🇦🇺 EN'}
+            </button>
+            <button
+              onClick={onScanClick}
+              className="bg-[#3DBE7A] text-white text-sm font-bold px-4 py-2 rounded-xl"
+            >
+              📷 Scan
+            </button>
+          </div>
         </div>
 
         {/* Day strip */}
@@ -80,7 +90,7 @@ export default function TodayTab({
           </div>
 
           {/* Rules grid */}
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Today</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t.today}</p>
           <div className="flex gap-2">
             {rules.map((rule) => (
               <div
@@ -90,7 +100,7 @@ export default function TodayTab({
                 <p className="text-xl">{rule.icon}</p>
                 <p className="text-[10px] text-gray-400 font-semibold mt-1">{rule.label}</p>
                 <p className={`text-xs font-black mt-0.5 ${rule.ok ? 'text-[#3DBE7A]' : 'text-red-400'}`}>
-                  {rule.ok ? 'OK' : 'No'}
+                  {rule.ok ? t.ok : t.no}
                 </p>
               </div>
             ))}
@@ -107,7 +117,7 @@ export default function TodayTab({
               📜
             </div>
             <div className="flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">Story behind today</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-500">{t.storyBehindToday}</p>
               <p className="text-sm font-bold text-[#1A1A2E]">{day.storyTitle}</p>
             </div>
             <span className="text-amber-400 text-lg">{storyOpen ? '▲' : '▼'}</span>
@@ -124,8 +134,18 @@ export default function TodayTab({
           onClick={onScanClick}
           className="w-full bg-[#3DBE7A] text-white font-black text-base py-4 rounded-2xl shadow-lg"
         >
-          📷 Scan a Product
+          {t.scanAProduct}
         </button>
+
+        {/* Recipe shortcut */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-3">
+          <div className="text-3xl">🍽️</div>
+          <div className="flex-1">
+            <p className="text-sm font-black text-[#1A1A2E]">{t.whatShouldICook}</p>
+            <p className="text-xs text-gray-400">{t.fastingRecipesToday}</p>
+          </div>
+          <span className="text-[#3DBE7A] text-lg">→</span>
+        </div>
 
       </div>
     </div>

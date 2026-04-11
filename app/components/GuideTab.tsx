@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '../context/LanguageContext'
 
 const FAQS = [
   {
@@ -35,15 +36,16 @@ const FAQS = [
 
 export default function GuideTab() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const { t } = useLanguage()
 
   return (
     <div className="flex flex-col h-full">
 
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">New to fasting?</p>
-        <h2 className="text-2xl font-black text-[#1A1A2E]">Your Guide ☦️</h2>
-        <p className="text-sm text-gray-400 mt-1">Everything you need to know, explained simply.</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{t.newToFasting}</p>
+        <h2 className="text-2xl font-black text-[#1A1A2E]">{t.yourGuide}</h2>
+        <p className="text-sm text-gray-400 mt-1">{t.explainedSimply}</p>
       </div>
 
       {/* Content */}
@@ -51,10 +53,10 @@ export default function GuideTab() {
 
         {/* Quick rules card */}
         <div className="bg-white rounded-2xl p-4 shadow-sm mb-2">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Always avoided</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">{t.alwaysAvoided}</p>
           {[
-            { icon: '🥩', label: 'Meat', note: 'All kinds' },
-            { icon: '🧀', label: 'Dairy', note: 'Milk, cheese, butter, yoghurt' },
+            { icon: '🥩', label: t.meat, note: 'All kinds' },
+            { icon: '🧀', label: t.dairy, note: 'Milk, cheese, butter, yoghurt' },
             { icon: '🥚', label: 'Eggs', note: 'All week' },
           ].map((item, i) => (
             <div key={i} className={`flex items-center gap-3 py-2 ${i < 2 ? 'border-b border-gray-100' : ''}`}>
@@ -63,15 +65,15 @@ export default function GuideTab() {
                 <p className="text-sm font-bold text-[#1A1A2E]">{item.label}</p>
                 <p className="text-xs text-gray-400">{item.note}</p>
               </div>
-              <span className="text-xs font-black text-red-400">Always No</span>
+              <span className="text-xs font-black text-red-400">{t.alwaysNo}</span>
             </div>
           ))}
 
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 mt-4">Depends on the day</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3 mt-4">{t.dependsOnDay}</p>
           {[
-            { icon: '🐟', label: 'Fish', note: 'Palm Sunday only' },
-            { icon: '🫒', label: 'Oil', note: 'Holy Thursday only' },
-            { icon: '🍷', label: 'Wine', note: 'Holy Thursday only' },
+            { icon: '🐟', label: t.fish, note: 'Palm Sunday only' },
+            { icon: '🫒', label: t.oil, note: 'Holy Thursday only' },
+            { icon: '🍷', label: t.wine, note: 'Holy Thursday only' },
           ].map((item, i) => (
             <div key={i} className={`flex items-center gap-3 py-2 ${i < 2 ? 'border-b border-gray-100' : ''}`}>
               <span className="text-2xl">{item.icon}</span>
@@ -79,7 +81,7 @@ export default function GuideTab() {
                 <p className="text-sm font-bold text-[#1A1A2E]">{item.label}</p>
                 <p className="text-xs text-gray-400">{item.note}</p>
               </div>
-              <span className="text-xs font-black text-amber-400">Some days</span>
+              <span className="text-xs font-black text-amber-400">{t.someDays}</span>
             </div>
           ))}
         </div>
