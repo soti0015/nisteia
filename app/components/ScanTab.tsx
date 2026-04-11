@@ -2,17 +2,26 @@
 
 import { useState, useCallback } from 'react'
 import { DAYS } from '../data/days'
+import { useLanguage } from '../context/LanguageContext'
 import BarcodeScanner from './BarcodeScanner'
 
 const PRODUCTS: Record<string, { name: string; brand: string; emoji: string; meat: boolean; dairy: boolean; fish: boolean; oil: boolean }> = {
   'DEMO1': { name: 'Vetta Pasta', brand: 'Vetta', emoji: '🍝', meat: false, dairy: false, fish: false, oil: false },
   'DEMO2': { name: 'Chicken Stock Cubes', brand: 'Maggi', emoji: '🍗', meat: true, dairy: false, fish: false, oil: false },
   '9310036009101': { name: 'Heinz Baked Beans', brand: 'Heinz', emoji: '🫘', meat: false, dairy: false, fish: false, oil: false },
-  '9310072003698': { name: 'Sao Crackers', brand: "Arnott's", emoji: '🍘', meat: false, dairy: false, fish: false, oil: true },
+  '9310072003698': { name: "Sao Crackers", brand: "Arnott's", emoji: '🍘', meat: false, dairy: false, fish: false, oil: true },
   '5010477348478': { name: 'Dairy Milk', brand: 'Cadbury', emoji: '🍫', meat: false, dairy: true, fish: false, oil: false },
 }
 
-export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: { 
+const PRODUCTS_GR: Record<string, string> = {
+  'DEMO1': 'Ζυμαρικά Vetta',
+  'DEMO2': 'Κύβοι Κοτόπουλου Maggi',
+  '9310036009101': 'Φασόλια Heinz',
+  '9310072003698': 'Κράκερ Sao',
+  '5010477348478': 'Σοκολάτα Γάλακτος Cadbury',
+}
+
+export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
   dayIdx: number
   onScannerOpen: () => void
   onScannerClose: () => void
@@ -21,74 +30,70 @@ export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
   const [result, setResult] = useState<null | { name: string; brand: string; emoji: string; ok: boolean; issues: string[]; pct: number }>(null)
   const [error, setError] = useState('')
   const [showScanner, setShowScanner] = useState(false)
+  const { t, language } = useLanguage()
 
   const day = DAYS[dayIdx]
+  const DAY_NAMES = [
+    t.palmSunday, t.holyMonday, t.holyTuesday, t.holyWednesday,
+    t.holyThursday, t.goodFriday, t.holySaturday,
+  ]
 
-async function checkProduct(code?: string) {
-  const value = code || input
-  setError('')
-  setResult(null)
+  async function checkProduct(code?: string) {
+    const value = code || input
+    setError('')
+    setResult(null)
 
-  if (!value.trim()) { setError('Enter a barcode to check.'); return }
+    if (!value.trim()) { setError(language === 'gr' ? 'Εισάγετε barcode.' : 'Enter a barcode to check.'); return }
 
-  // Check local products first
-  const key = value.trim().toUpperCase()
-  const local = PRODUCTS[key] || PRODUCTS[value.trim()]
+    const key = value.trim().toUpperCase()
+    const local = PRODUCTS[key] || PRODUCTS[value.trim()]
 
-  if (local) {
-    const issues: string[] = []
-    if (local.meat) issues.push('Contains meat 🥩')
-    if (local.dairy) issues.push('Contains dairy 🧀')
-    if (local.fish && !day.fish) issues.push('Contains fish 🐟')
-    if (local.oil && !day.oil) issues.push('Contains oil 🫒')
-    const pct = Math.round(((4 - issues.length) / 4) * 100)
-    setResult({ ...local, issues, pct, ok: issues.length === 0 })
-    return
-  }
-
-  // Otherwise look up Open Food Facts
-  try {
-    setError('Looking up product...')
-    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${value.trim()}.json`)
-    const data = await res.json()
-
-    if (data.status === 0) {
-      setError('Product not found. Try scanning another barcode.')
+    if (local) {
+      const issues: string[] = []
+      if (local.meat) issues.push(language === 'gr' ? `Περιέχει ${t.meat} 🥩` : `Contains ${t.meat} 🥩`)
+      if (local.dairy) issues.push(language === 'gr' ? `Περιέχει ${t.dairy} 🧀` : `Contains ${t.dairy} 🧀`)
+      if (local.fish && !day.fish) issues.push(language === 'gr' ? `Περιέχει ${t.fish} 🐟` : `Contains ${t.fish} 🐟`)
+      if (local.oil && !day.oil) issues.push(language === 'gr' ? `Περιέχει ${t.oil} 🫒` : `Contains ${t.oil} 🫒`)
+      const pct = Math.round(((4 - issues.length) / 4) * 100)
+      const displayName = language === 'gr' ? (PRODUCTS_GR[key] || local.name) : local.name
+      setResult({ ...local, name: displayName, issues, pct, ok: issues.length === 0 })
       return
     }
 
-    const product = data.product
-    const name = product.product_name || 'Unknown Product'
-    const brand = product.brands || 'Unknown Brand'
-    const ingredients = (product.ingredients_text || '').toLowerCase()
-    const labels = (product.labels || '').toLowerCase()
+    try {
+      setError(t.lookingUp)
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${value.trim()}.json`)
+      const data = await res.json()
 
-    const meat = /chicken|beef|pork|lamb|meat|bacon|ham|turkey|fish|salmon|tuna|prawn|shrimp|anchovy/.test(ingredients)
-    const dairy = /milk|cheese|butter|cream|yogurt|yoghurt|whey|lactose|casein/.test(ingredients)
-    const fish = /fish|salmon|tuna|cod|prawn|shrimp|anchovy|seafood/.test(ingredients)
-    const oil = /vegetable oil|olive oil|sunflower oil|canola oil|palm oil/.test(ingredients)
+      if (data.status === 0) {
+        setError(language === 'gr' ? 'Προϊόν δεν βρέθηκε. Δοκίμασε άλλο barcode.' : 'Product not found. Try scanning another barcode.')
+        return
+      }
 
-    const issues: string[] = []
-    if (meat && !fish) issues.push('Contains meat 🥩')
-    if (dairy) issues.push('Contains dairy 🧀')
-    if (fish && !day.fish) issues.push('Contains fish 🐟')
-    if (oil && !day.oil) issues.push('Contains oil 🫒')
+      const product = data.product
+      const name = product.product_name || (language === 'gr' ? 'Άγνωστο Προϊόν' : 'Unknown Product')
+      const brand = product.brands || (language === 'gr' ? 'Άγνωστη Μάρκα' : 'Unknown Brand')
+      const ingredients = (product.ingredients_text || '').toLowerCase()
 
-    const pct = Math.round(((4 - issues.length) / 4) * 100)
-    setError('')
-    setResult({
-      name,
-      brand,
-      emoji: '🛒',
-      issues,
-      pct,
-      ok: issues.length === 0,
-    })
+      const meat = /chicken|beef|pork|lamb|meat|bacon|ham|turkey/.test(ingredients)
+      const dairy = /milk|cheese|butter|cream|yogurt|yoghurt|whey|lactose|casein/.test(ingredients)
+      const fish = /fish|salmon|tuna|cod|prawn|shrimp|anchovy|seafood/.test(ingredients)
+      const oil = /vegetable oil|olive oil|sunflower oil|canola oil|palm oil/.test(ingredients)
 
-  } catch {
-    setError('Could not look up product. Check your connection.')
+      const issues: string[] = []
+      if (meat && !fish) issues.push(language === 'gr' ? `Περιέχει ${t.meat} 🥩` : `Contains ${t.meat} 🥩`)
+      if (dairy) issues.push(language === 'gr' ? `Περιέχει ${t.dairy} 🧀` : `Contains ${t.dairy} 🧀`)
+      if (fish && !day.fish) issues.push(language === 'gr' ? `Περιέχει ${t.fish} 🐟` : `Contains ${t.fish} 🐟`)
+      if (oil && !day.oil) issues.push(language === 'gr' ? `Περιέχει ${t.oil} 🫒` : `Contains ${t.oil} 🫒`)
+
+      const pct = Math.round(((4 - issues.length) / 4) * 100)
+      setError('')
+      setResult({ name, brand, emoji: '🛒', issues, pct, ok: issues.length === 0 })
+
+    } catch {
+      setError(language === 'gr' ? 'Σφάλμα σύνδεσης. Έλεγξε το internet.' : 'Could not look up product. Check your connection.')
+    }
   }
-}
 
   const handleScan = useCallback((code: string) => {
     setInput(code)
@@ -101,28 +106,28 @@ async function checkProduct(code?: string) {
 
       {/* Header */}
       <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Checking for</p>
-        <h2 className="text-2xl font-black text-[#1A1A2E]">{day.name}</h2>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{t.checkingFor}</p>
+        <h2 className="text-2xl font-black text-[#1A1A2E]">{DAY_NAMES[dayIdx]}</h2>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
 
-        {/* Camera button + input */}
+        {/* Camera button */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
-  <button
-    onClick={() => { setShowScanner(true); onScannerOpen() }}
-    className="w-full bg-[#1A1A2E] text-white font-black text-lg py-5 rounded-xl"
-  >
-    📷 Open Camera Scanner
-  </button>
-  <p className="text-xs text-gray-400 text-center mt-3">
-    Point your camera at any product barcode
-  </p>
-</div>
+          <button
+            onClick={() => { setShowScanner(true); onScannerOpen() }}
+            className="w-full bg-[#1A1A2E] text-white font-black text-lg py-5 rounded-xl"
+          >
+            {t.openCameraScanner}
+          </button>
+          <p className="text-xs text-gray-400 text-center mt-3">
+            {t.pointAtBarcode}
+          </p>
+        </div>
 
         {/* Example products */}
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Try these</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t.tryThese}</p>
         {Object.entries(PRODUCTS).slice(0, 4).map(([code, p]) => (
           <button
             key={code}
@@ -131,7 +136,9 @@ async function checkProduct(code?: string) {
           >
             <span className="text-2xl">{p.emoji}</span>
             <div>
-              <p className="text-sm font-bold text-[#1A1A2E]">{p.name}</p>
+              <p className="text-sm font-bold text-[#1A1A2E]">
+                {language === 'gr' ? (PRODUCTS_GR[code] || p.name) : p.name}
+              </p>
               <p className="text-xs text-gray-400">{p.brand} · {code}</p>
             </div>
           </button>
@@ -161,16 +168,16 @@ async function checkProduct(code?: string) {
               <div className={`rounded-xl p-4 text-center mb-3 ${result.ok ? 'bg-[#F0FAF5]' : 'bg-red-50'}`}>
                 <p className="text-4xl mb-2">{result.ok ? '✅' : '🚫'}</p>
                 <p className={`text-lg font-black ${result.ok ? 'text-[#3DBE7A]' : 'text-red-400'}`}>
-                  {result.ok ? 'You can eat this!' : 'Avoid this today'}
+                  {result.ok ? t.youCanEatThis : t.avoidThisToday}
                 </p>
               </div>
               {result.issues.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Why not?</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t.whyNot}</p>
                   {result.issues.map((issue, i) => (
                     <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                       <p className="text-sm font-semibold text-gray-600">{issue}</p>
-                      <p className="text-xs font-bold text-red-400">Not today</p>
+                      <p className="text-xs font-bold text-red-400">{t.notToday}</p>
                     </div>
                   ))}
                 </div>
@@ -181,11 +188,11 @@ async function checkProduct(code?: string) {
       </div>
 
       {showScanner && (
-  <BarcodeScanner
-    day={day}
-    onClose={() => { setShowScanner(false); onScannerClose() }}
-  />
-)}
+        <BarcodeScanner
+          day={day}
+          onClose={() => { setShowScanner(false); onScannerClose() }}
+        />
+      )}
 
     </div>
   )
