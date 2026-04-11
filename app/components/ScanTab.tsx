@@ -110,29 +110,16 @@ async function checkProduct(code?: string) {
 
         {/* Camera button + input */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <button
-            onClick={() => { setShowScanner(true); onScannerOpen() }}
-            className="w-full bg-[#1A1A2E] text-white font-black text-base py-4 rounded-xl mb-3"
-          >
-            📷 Open Camera Scanner
-          </button>
-          <p className="text-xs text-gray-400 text-center mb-3">or type a barcode below</p>
-          <div className="flex gap-2">
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && checkProduct()}
-              placeholder="DEMO1, DEMO2, or barcode..."
-              className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm text-[#1A1A2E] outline-none focus:border-[#3DBE7A]"
-            />
-            <button
-              onClick={() => checkProduct()}
-              className="bg-[#3DBE7A] text-white font-black text-sm px-4 rounded-xl"
-            >
-              Check
-            </button>
-          </div>
-        </div>
+  <button
+    onClick={() => { setShowScanner(true); onScannerOpen() }}
+    className="w-full bg-[#1A1A2E] text-white font-black text-lg py-5 rounded-xl"
+  >
+    📷 Open Camera Scanner
+  </button>
+  <p className="text-xs text-gray-400 text-center mt-3">
+    Point your camera at any product barcode
+  </p>
+</div>
 
         {/* Example products */}
         <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Try these</p>
