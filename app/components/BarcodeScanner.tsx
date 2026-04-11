@@ -27,6 +27,13 @@ export default function BarcodeScanner({
   const [torchOn, setTorchOn] = useState(false)
 
   useEffect(() => {
+  document.body.style.overflow = 'hidden'
+  return () => {
+    document.body.style.overflow = ''
+  }
+}, [])
+
+  useEffect(() => {
     const reader = new BrowserMultiFormatReader()
 
     navigator.mediaDevices.getUserMedia({
