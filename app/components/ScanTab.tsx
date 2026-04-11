@@ -189,13 +189,12 @@ async function checkProduct(code?: string) {
         )}
       </div>
 
-      {/* Scanner overlay */}
       {showScanner && (
-        <BarcodeScanner
-          onScan={handleScan}
-          onClose={() => setShowScanner(false)}
-        />
-      )}
+  <BarcodeScanner
+    day={day}
+    onClose={() => setShowScanner(false)}
+  />
+)}
 
     </div>
   )
