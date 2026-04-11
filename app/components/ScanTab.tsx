@@ -6,19 +6,19 @@ import { useLanguage } from '../context/LanguageContext'
 import BarcodeScanner from './BarcodeScanner'
 
 const PRODUCTS: Record<string, { name: string; brand: string; emoji: string; meat: boolean; dairy: boolean; fish: boolean; oil: boolean }> = {
-  'DEMO1': { name: 'Vetta Pasta', brand: 'Vetta', emoji: '🍝', meat: false, dairy: false, fish: false, oil: false },
-  'DEMO2': { name: 'Chicken Stock Cubes', brand: 'Maggi', emoji: '🍗', meat: true, dairy: false, fish: false, oil: false },
   '9310036009101': { name: 'Heinz Baked Beans', brand: 'Heinz', emoji: '🫘', meat: false, dairy: false, fish: false, oil: false },
-  '9310072003698': { name: "Sao Crackers", brand: "Arnott's", emoji: '🍘', meat: false, dairy: false, fish: false, oil: true },
-  '5010477348478': { name: 'Dairy Milk', brand: 'Cadbury', emoji: '🍫', meat: false, dairy: true, fish: false, oil: false },
+  '9300675033019': { name: 'Weet-Bix', brand: 'Sanitarium', emoji: '🌾', meat: false, dairy: false, fish: false, oil: false },
+  '9310017009009': { name: 'Tip Top White Bread', brand: 'Tip Top', emoji: '🍞', meat: false, dairy: false, fish: false, oil: true },
+  '9310023007553': { name: 'Milo', brand: 'Nestlé', emoji: '🥛', meat: false, dairy: true, fish: false, oil: false },
+  '9310587002271': { name: 'Vegemite', brand: 'Bega', emoji: '🫙', meat: false, dairy: false, fish: false, oil: false },
 }
 
 const PRODUCTS_GR: Record<string, string> = {
-  'DEMO1': 'Ζυμαρικά Vetta',
-  'DEMO2': 'Κύβοι Κοτόπουλου Maggi',
   '9310036009101': 'Φασόλια Heinz',
-  '9310072003698': 'Κράκερ Sao',
-  '5010477348478': 'Σοκολάτα Γάλακτος Cadbury',
+  '9300675033019': 'Weet-Bix Sanitarium',
+  '9310017009009': 'Λευκό Ψωμί Tip Top',
+  '9310023007553': 'Milo Nestlé',
+  '9310587002271': 'Vegemite',
 }
 
 export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
