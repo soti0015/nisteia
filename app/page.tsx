@@ -7,10 +7,11 @@ import ScanTab from './components/ScanTab'
 import RecipesTab from './components/RecipesTab'
 import GuideTab from './components/GuideTab'
 import ForYouTab from './components/ForYouTab'
+import { getTodayDayIdx } from './data/days'
 
 export default function Home() {
   const [tab, setTab] = useState(0)
-  const [dayIdx, setDayIdx] = useState(5)
+  const [dayIdx, setDayIdx] = useState(getTodayDayIdx())
   const [scannerOpen, setScannerOpen] = useState(false)
   const { t } = useLanguage()
 

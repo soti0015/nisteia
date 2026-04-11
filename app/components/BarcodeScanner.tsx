@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
+import { useLanguage } from '../context/LanguageContext'
 
 type ProductResult = {
   name: string
@@ -25,13 +26,21 @@ export default function BarcodeScanner({
   const [result, setResult] = useState<ProductResult>(null)
   const [loading, setLoading] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
+  const { t, language } = useLanguage()
+
+  const DAY_NAMES = [
+    t.palmSunday, t.holyMonday, t.holyTuesday, t.holyWednesday,
+    t.holyThursday, t.goodFriday, t.holySaturday,
+  ]
+
+  const DAYS_EN = ['Palm Sunday', 'Holy Monday', 'Holy Tuesday', 'Holy Wednesday', 'Holy Thursday', 'Good Friday', 'Holy Saturday']
+  const dayIdx = DAYS_EN.indexOf(day.name)
+  const displayDayName = dayIdx >= 0 ? DAY_NAMES[dayIdx] : day.name
 
   useEffect(() => {
-  document.body.style.overflow = 'hidden'
-  return () => {
-    document.body.style.overflow = ''
-  }
-}, [])
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
 
   useEffect(() => {
     const reader = new BrowserMultiFormatReader()
@@ -75,16 +84,16 @@ export default function BarcodeScanner({
 
       if (data.status === 0) {
         setResult({
-          name: 'Product not found',
-          brand: 'Not in our database',
+          name: language === 'gr' ? 'Προϊόν δεν βρέθηκε' : 'Product not found',
+          brand: language === 'gr' ? 'Δεν υπάρχει στη βάση μας' : 'Not in our database',
           ok: false,
-          issues: ['This product was not found. Try another barcode.'],
+          issues: [language === 'gr' ? 'Αυτό το προϊόν δεν βρέθηκε. Δοκίμασε άλλο barcode.' : 'This product was not found. Try another barcode.'],
         })
         return
       }
 
       const p = data.product
-      const name = p.product_name || 'Unknown Product'
+      const name = p.product_name || (language === 'gr' ? 'Άγνωστο Προϊόν' : 'Unknown Product')
       const brand = p.brands || ''
       const ingredients = (p.ingredients_text || '').toLowerCase()
 
@@ -94,18 +103,19 @@ export default function BarcodeScanner({
       const hasOil   = /vegetable oil|olive oil|sunflower oil|canola oil|palm oil/.test(ingredients)
 
       const issues: string[] = []
-      if (hasMeat)              issues.push('Contains meat 🥩')
-      if (hasDairy)             issues.push('Contains dairy 🧀')
-      if (hasFish && !day.fish) issues.push('Contains fish 🐟')
-      if (hasOil  && !day.oil)  issues.push('Contains oil 🫒')
+      const contains = language === 'gr' ? 'Περιέχει' : 'Contains'
+      if (hasMeat)              issues.push(`${contains} ${t.meat} 🥩`)
+      if (hasDairy)             issues.push(`${contains} ${t.dairy} 🧀`)
+      if (hasFish && !day.fish) issues.push(`${contains} ${t.fish} 🐟`)
+      if (hasOil  && !day.oil)  issues.push(`${contains} ${t.oil} 🫒`)
 
       setResult({ name, brand, ok: issues.length === 0, issues })
     } catch {
       setResult({
-        name: 'Error',
+        name: language === 'gr' ? 'Σφάλμα' : 'Error',
         brand: '',
         ok: false,
-        issues: ['Could not look up product. Check your connection.'],
+        issues: [language === 'gr' ? 'Σφάλμα σύνδεσης. Έλεγξε το internet.' : 'Could not look up product. Check your connection.'],
       })
     }
   }
@@ -134,6 +144,7 @@ export default function BarcodeScanner({
 
   return (
     <div className="fixed inset-0 z-[999] flex flex-col">
+
       {/* Full screen camera */}
       <video
         ref={videoRef}
@@ -142,19 +153,24 @@ export default function BarcodeScanner({
 
       {/* Top bar */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-10 pb-4 bg-gradient-to-b from-black/60 to-transparent">
-        <p className="text-white font-black text-lg">Scan Barcode</p>
+        <p className="text-white font-black text-lg">
+          {language === 'gr' ? 'Σάρωση Barcode' : 'Scan Barcode'}
+        </p>
         <div className="flex items-center gap-3">
           <button
             onClick={toggleTorch}
             className={`text-sm font-bold px-3 py-1 rounded-full ${torchOn ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}
           >
-            {torchOn ? '🔦 On' : '🔦 Off'}
+            {torchOn
+              ? (language === 'gr' ? '🔦 Ανοιχτό' : '🔦 On')
+              : (language === 'gr' ? '🔦 Κλειστό' : '🔦 Off')
+            }
           </button>
           <button
             onClick={onClose}
             className="text-white text-sm font-bold bg-white/20 px-3 py-1 rounded-full"
           >
-            Cancel
+            {language === 'gr' ? 'Ακύρωση' : 'Cancel'}
           </button>
         </div>
       </div>
@@ -163,7 +179,7 @@ export default function BarcodeScanner({
       {!result && !loading && (
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
           <div className="w-64 h-36 border-2 border-white/80 rounded-2xl" />
-          <p className="text-white/70 text-sm mt-4">Point at a barcode</p>
+          <p className="text-white/70 text-sm mt-4">{t.pointAtBarcode}</p>
         </div>
       )}
 
@@ -172,7 +188,7 @@ export default function BarcodeScanner({
         <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
           <div className="bg-black/50 rounded-2xl px-6 py-4 flex flex-col items-center gap-2">
             <p className="text-3xl">🔍</p>
-            <p className="text-white font-bold">Looking up product...</p>
+            <p className="text-white font-bold">{t.lookingUp}</p>
           </div>
         </div>
       )}
@@ -196,9 +212,11 @@ export default function BarcodeScanner({
 
             <div className={`rounded-2xl px-4 py-3 mb-4 ${result.ok ? 'bg-[#F0FAF5]' : 'bg-red-50'}`}>
               <p className={`text-lg font-black ${result.ok ? 'text-[#3DBE7A]' : 'text-red-400'}`}>
-                {result.ok ? 'You can eat this today!' : 'Avoid this today'}
+                {result.ok ? t.youCanEatThis : t.avoidThisToday}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">on {day.name}</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {language === 'gr' ? 'για' : 'on'} {displayDayName}
+              </p>
             </div>
 
             {result.issues.length > 0 && (
@@ -216,13 +234,13 @@ export default function BarcodeScanner({
                 onClick={handleScanAgain}
                 className="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-[#1A1A2E] font-black text-sm"
               >
-                Scan Again
+                {t.scanAgain}
               </button>
               <button
                 onClick={onClose}
                 className="flex-1 py-3 rounded-2xl bg-[#1A1A2E] text-white font-black text-sm"
               >
-                Done
+                {t.done}
               </button>
             </div>
           </div>

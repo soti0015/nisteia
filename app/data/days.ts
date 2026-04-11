@@ -1,3 +1,37 @@
+export const HOLY_WEEK_2025 = {
+  start: new Date('2025-04-13'), // Palm Sunday
+  end: new Date('2025-04-19'),   // Holy Saturday
+}
+
+export function getTodayDayIdx(): number {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const holyWeekDates = [
+    new Date('2025-04-13'), // Palm Sunday
+    new Date('2025-04-14'), // Holy Monday
+    new Date('2025-04-15'), // Holy Tuesday
+    new Date('2025-04-16'), // Holy Wednesday
+    new Date('2025-04-17'), // Holy Thursday
+    new Date('2025-04-18'), // Good Friday
+    new Date('2025-04-19'), // Holy Saturday
+  ]
+
+  const idx = holyWeekDates.findIndex(d => {
+    const date = new Date(d)
+    date.setHours(0, 0, 0, 0)
+    return date.getTime() === today.getTime()
+  })
+
+  // If today matches a Holy Week day return it
+  if (idx !== -1) return idx
+
+  // If before Holy Week default to Palm Sunday
+  if (today < holyWeekDates[0]) return 0
+
+  // If after Holy Week default to Holy Saturday
+  return 6
+}
 export type Day = {
   name: string
   date: string
