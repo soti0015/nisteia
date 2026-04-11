@@ -1,5 +1,6 @@
 'use client'
-
+import React from 'react'
+import { useLanguage } from './context/LanguageContext'
 import { useState } from 'react'
 import TodayTab from './components/TodayTab'
 import ScanTab from './components/ScanTab'
@@ -16,6 +17,7 @@ const TABS = [
 ]
 
 export default function Home() {
+  const { language, toggleLanguage } = useLanguage()
   const [tab, setTab] = useState(0)
   const [dayIdx, setDayIdx] = useState(5)
   const [scannerOpen, setScannerOpen] = useState(false)
@@ -45,7 +47,6 @@ export default function Home() {
           {tab === 4 && <ForYouTab dayIdx={dayIdx} />}
         </div>
 
-{/* Tab bar — hidden when scanner is open */}
 <div className={`bg-white border-t border-gray-100 flex shadow-lg ${scannerOpen ? 'hidden' : ''}`}>
   {TABS.map((t, i) => (
     <button
