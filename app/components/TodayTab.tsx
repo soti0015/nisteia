@@ -19,6 +19,16 @@ export default function TodayTab({
   const { language, toggleLanguage, t } = useLanguage()
   const day = DAYS[dayIdx]
 
+  const DAY_NAMES = [
+    t.palmSunday,
+    t.holyMonday,
+    t.holyTuesday,
+    t.holyWednesday,
+    t.holyThursday,
+    t.goodFriday,
+    t.holySaturday,
+  ]
+
   const rules = [
     { label: t.meat,  icon: '🥩', ok: false },
     { label: t.dairy, icon: '🧀', ok: false },
@@ -65,7 +75,7 @@ export default function TodayTab({
                   : 'bg-white text-gray-400 border-gray-200'
               }`}
             >
-              {d.icon} {d.name}
+              {d.icon} {DAY_NAMES[i]}
             </button>
           ))}
         </div>
@@ -81,7 +91,7 @@ export default function TodayTab({
               {day.icon}
             </div>
             <div>
-              <h2 className="text-lg font-black text-[#1A1A2E]">{day.name}</h2>
+              <h2 className="text-lg font-black text-[#1A1A2E]">{DAY_NAMES[dayIdx]}</h2>
               <p className="text-xs text-gray-400">{day.date}</p>
             </div>
           </div>
