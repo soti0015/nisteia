@@ -6,7 +6,7 @@ import TodayTab from './components/TodayTab'
 import ScanTab from './components/ScanTab'
 import RecipesTab from './components/RecipesTab'
 import GuideTab from './components/GuideTab'
-import ForYouTab from './components/ForYouTab'
+import ForYouTab, { type Suggestion } from './components/ForYouTab'
 import EasterScreen from './components/EasterScreen'
 import { getTodayDayIdx } from './data/days'
 
@@ -14,6 +14,8 @@ export default function Home() {
   const [tab, setTab] = useState(0)
   const [dayIdx, setDayIdx] = useState(getTodayDayIdx())
   const [scannerOpen, setScannerOpen] = useState(false)
+  const [forYouSelected, setForYouSelected] = useState<string[]>([])
+  const [forYouSuggestions, setForYouSuggestions] = useState<Suggestion[] | null>(null)
   const { t } = useLanguage()
 
   function isEasterSunday(): boolean {
@@ -43,7 +45,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F4F6F8] flex justify-center">
+    <main className="h-screen overflow-hidden bg-[#F4F6F8] flex justify-center">
       <div className="w-full max-w-sm flex flex-col h-screen">
 
         <div className="flex-1 overflow-hidden">
@@ -64,7 +66,15 @@ export default function Home() {
           )}
           {tab === 2 && <RecipesTab dayIdx={dayIdx} />}
           {tab === 3 && <GuideTab />}
-          {tab === 4 && <ForYouTab dayIdx={dayIdx} />}
+          {tab === 4 && (
+            <ForYouTab
+              dayIdx={dayIdx}
+              selected={forYouSelected}
+              setSelected={setForYouSelected}
+              suggestions={forYouSuggestions}
+              setSuggestions={setForYouSuggestions}
+            />
+          )}
         </div>
 
         <div className={`bg-white border-t border-gray-100 flex shadow-lg ${scannerOpen ? 'hidden' : ''}`}>

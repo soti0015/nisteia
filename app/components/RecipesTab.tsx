@@ -5,12 +5,18 @@ import { DAYS } from '../data/days'
 import { useLanguage } from '../context/LanguageContext'
 
 const RECIPES = [
-  { name: 'Bean Soup', greek: 'Φασολάδα', emoji: '🫘', time: '45 min', oilOk: true, fishOk: false },
-  { name: 'Lentil Soup', greek: 'Φακές', emoji: '🍲', time: '30 min', oilOk: false, fishOk: false },
-  { name: 'Taramasalata', greek: 'Ταραμοσαλάτα', emoji: '🐟', time: '10 min', oilOk: true, fishOk: true },
-  { name: 'Sesame Bread', greek: 'Λαγάνα', emoji: '🍞', time: '2 hrs', oilOk: true, fishOk: false },
-  { name: 'Spinach Rice', greek: 'Σπανακόριζο', emoji: '🌿', time: '30 min', oilOk: true, fishOk: false },
-  { name: 'Halva', greek: 'Χαλβάς', emoji: '🍮', time: '20 min', oilOk: false, fishOk: false },
+  { name: 'Bean Soup', greek: 'Φασολάδα', emoji: '🫘', time: '45 min', oilOk: true, fishOk: false,
+    macros: { cal: 320, protein: 14, carbs: 52, fat: 8, serving: '1 bowl · 250g' } },
+  { name: 'Lentil Soup', greek: 'Φακές', emoji: '🍲', time: '30 min', oilOk: false, fishOk: false,
+    macros: { cal: 230, protein: 16, carbs: 38, fat: 1, serving: '1 bowl · 250g' } },
+  { name: 'Taramasalata', greek: 'Ταραμοσαλάτα', emoji: '🐟', time: '10 min', oilOk: true, fishOk: true,
+    macros: { cal: 130, protein: 2, carbs: 8, fat: 10, serving: '2 tbsp · 30g' } },
+  { name: 'Sesame Bread', greek: 'Λαγάνα', emoji: '🍞', time: '2 hrs', oilOk: true, fishOk: false,
+    macros: { cal: 220, protein: 6, carbs: 38, fat: 5, serving: '1 slice · 80g' } },
+  { name: 'Spinach Rice', greek: 'Σπανακόριζο', emoji: '🌿', time: '30 min', oilOk: true, fishOk: false,
+    macros: { cal: 240, protein: 5, carbs: 40, fat: 7, serving: '1 serve · 200g' } },
+  { name: 'Halva', greek: 'Χαλβάς', emoji: '🍮', time: '20 min', oilOk: false, fishOk: false,
+    macros: { cal: 350, protein: 7, carbs: 58, fat: 10, serving: '1 slice · 100g' } },
 ]
 
 export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
@@ -59,6 +65,20 @@ export default function RecipesTab({ dayIdx }: { dayIdx: number }) {
               </button>
               {isOpen && (
                 <div className="border-t border-gray-100 px-4 pb-4 pt-3 bg-gray-50">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{t.nutrition} · {rec.macros.serving}</p>
+                  <div className="flex gap-2 mb-4">
+                    {[
+                      { label: 'Cal',     value: rec.macros.cal,     unit: 'kcal', bg: 'bg-orange-50', text: 'text-orange-500' },
+                      { label: 'Protein', value: rec.macros.protein, unit: 'g',    bg: 'bg-blue-50',   text: 'text-blue-500' },
+                      { label: 'Carbs',   value: rec.macros.carbs,   unit: 'g',    bg: 'bg-yellow-50', text: 'text-yellow-600' },
+                      { label: 'Fat',     value: rec.macros.fat,     unit: 'g',    bg: 'bg-purple-50', text: 'text-purple-500' },
+                    ].map(m => (
+                      <div key={m.label} className={`flex-1 rounded-xl py-2 text-center ${m.bg}`}>
+                        <p className={`text-sm font-black ${m.text}`}>{m.value}{m.unit}</p>
+                        <p className="text-[9px] font-bold uppercase text-gray-400 mt-0.5">{m.label}</p>
+                      </div>
+                    ))}
+                  </div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[#3DBE7A] mb-3">{t.howToMakeIt}</p>
                   {translation.steps.map((step, j) => (
                     <div key={j} className="flex gap-3 mb-3">

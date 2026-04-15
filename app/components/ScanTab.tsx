@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { DAYS } from '../data/days'
 import { useLanguage } from '../context/LanguageContext'
 import BarcodeScanner from './BarcodeScanner'
@@ -46,7 +46,6 @@ export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
   onScannerOpen: () => void
   onScannerClose: () => void
 }) {
-  const [input, setInput] = useState('')
   const [result, setResult] = useState<null | { name: string; brand: string; emoji: string; ok: boolean; issues: string[]; pct: number }>(null)
   const [error, setError] = useState('')
   const [showScanner, setShowScanner] = useState(false)
@@ -58,15 +57,12 @@ export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
     t.holyThursday, t.goodFriday, t.holySaturday,
   ]
 
-  async function checkProduct(code?: string) {
-    const value = code || input
+  async function checkProduct(code: string) {
     setError('')
     setResult(null)
 
-    if (!value.trim()) { setError(language === 'gr' ? 'Εισάγετε barcode.' : 'Enter a barcode to check.'); return }
-
-    const key = value.trim().toUpperCase()
-    const local = PRODUCTS[key] || PRODUCTS[value.trim()]
+    const key = code.trim().toUpperCase()
+    const local = PRODUCTS[key] || PRODUCTS[code.trim()]
 
     if (local) {
       const issues: string[] = []
@@ -82,7 +78,7 @@ export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
 
     try {
       setError(t.lookingUp)
-      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${value.trim()}.json`)
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${code.trim()}.json`)
       const data = await res.json()
 
       if (data.status === 0) {
@@ -115,12 +111,6 @@ export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
     }
   }
 
-  const handleScan = useCallback((code: string) => {
-    setInput(code)
-    setShowScanner(false)
-    setTimeout(() => checkProduct(code), 300)
-  }, [day])
-
   return (
     <div className="flex flex-col h-full">
 
@@ -151,7 +141,7 @@ export default function ScanTab({ dayIdx, onScannerOpen, onScannerClose }: {
         {Object.entries(PRODUCTS).slice(0, 4).map(([code, p]) => (
           <button
             key={code}
-            onClick={() => { setInput(code); setResult(null); setError('') }}
+            onClick={() => checkProduct(code)}
             className="w-full bg-white rounded-2xl p-3 shadow-sm flex items-center gap-3 text-left"
           >
             <span className="text-2xl">{p.emoji}</span>

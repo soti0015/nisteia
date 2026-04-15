@@ -217,8 +217,8 @@ export default function BarcodeScanner({
       <div ref={scannerRef} className="absolute inset-0" style={{ overflow: 'hidden' }} />
 
       <style>{`
-        #interactive.viewport canvas { display: none; }
-        #interactive.viewport video { width: 100% !important; height: 100% !important; object-fit: cover; }
+        #interactive canvas, #interactive .drawingBuffer { display: none !important; }
+        #interactive video { width: 100% !important; height: 100% !important; object-fit: cover; position: absolute; top: 0; left: 0; }
         @keyframes scanline {
           0%, 100% { top: 20%; opacity: 0.4; }
           50% { top: 80%; opacity: 1; }

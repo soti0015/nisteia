@@ -4,20 +4,28 @@ import { useState } from 'react'
 import { DAYS } from '../data/days'
 import { useLanguage } from '../context/LanguageContext'
 
-type Suggestion = { name: string; desc: string; emoji: string }
+export type Suggestion = { name: string; desc: string; emoji: string }
 
-export default function ForYouTab({ dayIdx }: { dayIdx: number }) {
-  const [selected, setSelected] = useState<string[]>([])
-  const [suggestions, setSuggestions] = useState<Suggestion[] | null>(null)
+export default function ForYouTab({
+  dayIdx,
+  selected,
+  setSelected,
+  suggestions,
+  setSuggestions,
+}: {
+  dayIdx: number
+  selected: string[]
+  setSelected: (s: string[]) => void
+  suggestions: Suggestion[] | null
+  setSuggestions: (s: Suggestion[] | null) => void
+}) {
   const [loading, setLoading] = useState(false)
   const { t } = useLanguage()
 
   const day = DAYS[dayIdx]
 
   function togglePref(food: string) {
-    setSelected(prev =>
-      prev.includes(food) ? prev.filter(f => f !== food) : [...prev, food]
-    )
+    setSelected(selected.includes(food) ? selected.filter(f => f !== food) : [...selected, food])
     setSuggestions(null)
   }
 
