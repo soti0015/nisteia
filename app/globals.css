@@ -19,7 +19,11 @@
   }
 }
 
-html,
+html {
+  height: 100%;
+  overscroll-behavior: none;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -27,7 +31,9 @@ body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
-  position: fixed;
-  width: 100%;
-  touch-action: pan-x pan-y;
+}
+
+/* Allow momentum scrolling inside overflow containers on iOS */
+* {
+  -webkit-overflow-scrolling: touch;
 }
